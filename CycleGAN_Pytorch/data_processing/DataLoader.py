@@ -11,8 +11,8 @@ class Dataset(Dataset):
     def __init__(self, data_dir, transform=None, data_type='both'):
         """
         Custom Dataset Class
-        :param data_dir: data directory paths
-        :param transform: transforms to be applied to the images
+        :param data_dir: data directory paths [type: str]
+        :param transform: transforms to be applied to the images [type: boolean]
         :param data_type: data type ['both', 'a', 'b']
         """
         self.data_dir_A = os.path.join(data_dir, 'A')
@@ -57,6 +57,49 @@ class Dataset(Dataset):
 
             if img_A.ndim == 2: # channel이 없을 경우.
                 img_A = img_A[:, :, np.newaxis]
+            if img_A.dtype == np.uint8:
+                img_A /= 255.0
+
+            data['img_A'] = img_A
+
+        if self.data_type == 'b' or self.data_type == 'both':
+            img_B = cv2.imread(os.path.join(self.data_dir_B, self.data_B_list[idx]))
+            img_B = cv2.COLOR_BGR2RGB(img_B, cv2.COLOR_BGR2RGB)
+
+            if img_B.ndim == 2:
+                img_B = img_B[:, :, np.newaxis]
+            if img_B.dtype == np.uint8:
+                img_B /= 255.0
+
+            data['img_B'] = img_B
+
+        # apply transforms
+        if self.transform:
+            data = self.transform(data)
+
+        # numpy converted to tensor
+        data = ToTensor(data)
+
+        return data
+
+# ============================================ #
+#              Transforms 구현                  #
+# ============================================ #
+
+class ToTensor(object):
+    def __call__(self, data):
+        """
+
+        :param data: type is dict ['img_A': ____, 'img_B': ____]
+        :return: numpy of directory converted to tensor (data)
+        """
+        for key, value in data.items():
+            value = value.transpose((2, 0, 1)).astype('float32') # H, W, C -> C, H, W
+            data[key] = torch.from_numpy(value)
+
+        return data
+
+
 
 
 
