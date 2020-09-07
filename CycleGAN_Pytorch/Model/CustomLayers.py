@@ -26,7 +26,7 @@ class Conv2d(nn.Module):
             if activation_fn == 'relu':
                 layers += [nn.ReLU()]
             elif activation_fn == 'leakyrelu':
-                layers += [nn.LeakyReLU()]
+                layers += [nn.LeakyReLU(0.2)]
 
         self.layers = nn.Sequential(*layers)
 
@@ -52,7 +52,7 @@ class DeConv2d(nn.Module):
             if activation_fn == 'relu':
                 layers += [nn.ReLU()]
             elif activation_fn == 'leakyrelu':
-                layers += [nn.LeakyReLU()]
+                layers += [nn.LeakyReLU(0.2)]
 
         self.layers = nn.Sequential(*layers)
 
